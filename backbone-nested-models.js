@@ -87,12 +87,18 @@
 
     Backbone.Model.prototype.toJSON = function(options) {
       var attrs = _.clone(this.attributes);
-
+      
+      //Need to manage the max recurrsion
+      if(options.depth === 0) return false;
+      
+      --options.depth || (options.depth = 10);
+	
       _.each(this.relations, function(rel, key) {
         if (_.has(attrs, key)) {
-          attrs[key] = attrs[key].toJSON();
+          attrs[key] = attrs[key].toJSON(options);
         } else {
-            attrs[key] = (new rel()).toJSON();
+          //Why are we doing this? Why not have nothing if it is not there?
+          attrs[key] = (new rel()).toJSON(options);
         }
       });
 
